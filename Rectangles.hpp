@@ -12,14 +12,23 @@
 #include <stdio.h>
 #include <vector>
 #include <array>
+#include <random>
+#include "opencv2/imgproc/imgproc.hpp"
+
 
 class Rectangles {
-    int patchWidth;
-    int patchHeight;
-    int numberOfRectangles;
-    
+    const int patchWidth;
+    const int patchHeight;
+    const int numberOfRectangles;
 public:
-    std::vector<std::array<int, 4>> generate_rectangles();
+    cv::vector<cv::Rect> generate_rectangles();
+    
+    int get_patchWidth()const {
+        return this->patchWidth;
+    }
+    int get_patchHeight()const {
+        return this->patchHeight;
+    }
     
     Rectangles();
     Rectangles(int, int);

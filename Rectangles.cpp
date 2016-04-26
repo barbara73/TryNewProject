@@ -8,7 +8,7 @@
 
 #include "Rectangles.hpp"
 #include <iostream>
-#include <random>
+
 
 using namespace std;
 
@@ -39,17 +39,19 @@ void print(T & t, size_t rows, size_t columns)
 }
 
 // generate rectangles needed as features
-std::vector<std::array<int, 4>> Rectangles::generate_rectangles() {
+//---------------------------------------
+std::vector<cv::Rect> Rectangles::generate_rectangles() {
     
     random_device rdev{};
     default_random_engine e{1};//rdev()};
     uniform_int_distribution<int>  d1{0, patchWidth-1};
     uniform_int_distribution<int>  d2{0, patchHeight-1};
-
+    
     
     int numberRect = numberOfRectangles+1000;
     vector<array<int, 4>> bBox(numberRect);
-
+    
+    
     int i = 0;
     
     while (i < bBox.size()) {
@@ -76,25 +78,32 @@ std::vector<std::array<int, 4>> Rectangles::generate_rectangles() {
             else
                 top = y2;
             
-            bBox[i] = {top, left, width, height};
+            bBox[i] = {left, top, width, height};
             
             i += 1;
         }
     }
-
+    
     sort(bBox.begin(), bBox.end());
     auto last = unique(bBox.begin(), bBox.end());
     bBox.erase(last, bBox.end());
-
+    
     random_shuffle(bBox.begin(), bBox.end());
     
-     if (bBox.size() < numberOfRectangles) {
-         cerr << "number of Rectangles smaller" << endl;
+    if (bBox.size() < numberOfRectangles) {
+        cerr << "number of Rectangles smaller" << endl;
     }
     
-    vector<array<int, 4>>::const_iterator firstNB = bBox.begin();
-    vector<array<int, 4>>::const_iterator lastNB = bBox.begin() + numberOfRectangles;
-    vector<array<int, 4>> boundingBox(firstNB, lastNB);
+    std::vector<array<int, 4>>::const_iterator firstNB = bBox.begin();
+    std::vector<array<int, 4>>::const_iterator lastNB = bBox.begin() + numberOfRectangles;
+    std::vector<array<int, 4>> boundingBoxArray(firstNB, lastNB);
+    //print(boundingBoxArray, 10, 4);
+    
+    std::vector<cv::Rect> boundingBox(numberOfRectangles);
+    
+    for (int i=0; i!=numberOfRectangles; ++i) {
+        boundingBox[i] = cv::Rect(boundingBoxArray[i][0], boundingBoxArray[i][1], boundingBoxArray[i][2], boundingBoxArray[i][3]);
+    }
     
     return boundingBox;
 }
